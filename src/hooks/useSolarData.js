@@ -51,25 +51,30 @@ export const useSolarData = () => {
   setLoading(true);
   setError(null);
 
-  try {
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-    console.log("Using API URL:", apiUrl); // this is for debugging, remove when ready to embed
-    
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        q2_electricBill: electricBill,
-        q1_address: address
-      })
-    });
+ try {
+  // Temporarily hardcode the URL for testing
+  const response = await fetch('https://backendcalc.onrender.com', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      q2_electricBill: electricBill,
+      q1_address: address
+    })
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
-    }
+  if (!response.ok) {
+    // Handle non-2xx responses
+    const errorText = await response.text();
+    throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+  }
+
+  const responseData = await response.json();
+  const enhancedData = calculateEnhancedPricing(responseData);
+  setData(enhancedData);
+  localStorage.setItem('solarData', JSON.stringify(enhancedData));
+}
 
     const responseData = await response.json();
     const enhancedData = calculateEnhancedPricing(responseData);
