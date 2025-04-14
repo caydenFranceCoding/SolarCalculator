@@ -1,4 +1,4 @@
-// src/hooks/useSolarData.js
+// src/hooks/useSolarData.new.js
 import { useState, useEffect, useCallback } from 'react';
 
 const CONSTANTS = {
