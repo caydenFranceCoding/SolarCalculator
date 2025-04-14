@@ -43,43 +43,43 @@ export const useSolarData = () => {
   }, []);
 
   const fetchSolarData = useCallback(async (electricBill, address) => {
-  if (!electricBill || !address) {
-    setError('Electric bill and address are required');
-    return;
-  }
-
-  setLoading(true);
-  setError(null);
-
-  try {
-    // Temporarily hardcode the URL for testing
-    const response = await fetch('https://backendcalc.onrender.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        q2_electricBill: electricBill,
-        q1_address: address
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+    if (!electricBill || !address) {
+      setError('Electric bill and address are required');
+      return;
     }
 
-    const responseData = await response.json();
-    const enhancedData = calculateEnhancedPricing(responseData);
-    setData(enhancedData);
-    localStorage.setItem('solarData', JSON.stringify(enhancedData));
-  } catch (err) {
-    console.error('Error fetching solar data:', err);
-    setError(err.message || 'Failed to fetch solar data. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-}, [calculateEnhancedPricing]);
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Temporarily hardcode the URL for testing
+      const response = await fetch('https://backendcalc.onrender.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          q2_electricBill: electricBill,
+          q1_address: address
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+      }
+
+      const responseData = await response.json();
+      const enhancedData = calculateEnhancedPricing(responseData);
+      setData(enhancedData);
+      localStorage.setItem('solarData', JSON.stringify(enhancedData));
+    } catch (err) {
+      console.error('Error fetching solar data:', err);
+      setError(err.message || 'Failed to fetch solar data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [calculateEnhancedPricing]);
 
   return {
     data,
