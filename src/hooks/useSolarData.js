@@ -76,6 +76,12 @@ export const useSolarData = () => {
   localStorage.setItem('solarData', JSON.stringify(enhancedData));
 }
 
+  const responseData = await response.json();
+  const enhancedData = calculateEnhancedPricing(responseData);
+  setData(enhancedData);
+  localStorage.setItem('solarData', JSON.stringify(enhancedData));
+}
+
     const responseData = await response.json();
     const enhancedData = calculateEnhancedPricing(responseData);
     setData(enhancedData);
