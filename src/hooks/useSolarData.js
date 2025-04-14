@@ -42,45 +42,46 @@ export const useSolarData = () => {
     return enhancedData;
   }, []);
 
-  // Rest of the hook implementation...
-  // (Include your existing fetch and error handling logic)
-
   const fetchSolarData = useCallback(async (electricBill, address) => {
-    if (!electricBill || !address) {
-      setError('Electric bill and address are required');
-      return;
+  if (!electricBill || !address) {
+    setError('Electric bill and address are required');
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+
+  try {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    console.log("Using API URL:", apiUrl); // this is for debugging, remove when ready to embed
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q2_electricBill: electricBill,
+        q1_address: address
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
     }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('http://localhost:3001', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          q2_electricBill: electricBill,
-          q1_address: address
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      const enhancedData = calculateEnhancedPricing(responseData);
-      setData(enhancedData);
-      localStorage.setItem('solarData', JSON.stringify(enhancedData));
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching solar data:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [calculateEnhancedPricing]);
+    const responseData = await response.json();
+    const enhancedData = calculateEnhancedPricing(responseData);
+    setData(enhancedData);
+    localStorage.setItem('solarData', JSON.stringify(enhancedData));
+  } catch (err) {
+    console.error('Error fetching solar data:', err);
+    setError(err.message || 'Failed to fetch solar data. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+}, [calculateEnhancedPricing]);
 
   return {
     data,
