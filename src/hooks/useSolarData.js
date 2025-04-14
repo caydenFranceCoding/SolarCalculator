@@ -1,4 +1,4 @@
-// src/hooks/useSolarData.new.js
+// src/hooks/useSolarData.js
 import { useState, useEffect, useCallback } from 'react';
 
 const CONSTANTS = {
@@ -42,6 +42,9 @@ export const useSolarData = () => {
     return enhancedData;
   }, []);
 
+  // Rest of the hook implementation...
+  // (Include your existing fetch and error handling logic)
+
   const fetchSolarData = useCallback(async (electricBill, address) => {
     if (!electricBill || !address) {
       setError('Electric bill and address are required');
@@ -52,8 +55,7 @@ export const useSolarData = () => {
     setError(null);
 
     try {
-      // Temporarily hardcode the URL for testing
-      const response = await fetch('https://backendcalc.onrender.com', {
+      const response = await fetch('http://localhost:3001', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,8 +67,7 @@ export const useSolarData = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseData = await response.json();
@@ -74,8 +75,8 @@ export const useSolarData = () => {
       setData(enhancedData);
       localStorage.setItem('solarData', JSON.stringify(enhancedData));
     } catch (err) {
+      setError(err.message);
       console.error('Error fetching solar data:', err);
-      setError(err.message || 'Failed to fetch solar data. Please try again.');
     } finally {
       setLoading(false);
     }
